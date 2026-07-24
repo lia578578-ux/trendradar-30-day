@@ -2,6 +2,11 @@ name: Update TrendRadar 30-day dashboard
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/trendradar.yml"
   schedule:
     - cron: "17 * * * *"
 
