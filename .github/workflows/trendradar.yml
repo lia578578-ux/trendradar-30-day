@@ -1,0 +1,89 @@
+name: Update TrendRadar 30-day dashboard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: trendradar-pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout dashboard repository
+        uses: actions/checkout@v4
+
+      - name: Fetch pinned TrendRadar source
+        run: |
+          git clone --filter=blob:none https://github.com/SANSAN0/TrendRadar.git app
+          git -C app checkout 8ee26026
+          git -C app apply ../trendradar-30day.patch
+          cp config.yaml app/config/config.yaml
+          cp frequency_words.txt app/config/frequency_words.txt
+
+      - name: Restore rolling history
+        run: |
+          mkdir -p app/output/news app/output/rss
+          if [ -d data/news ]; then cp -a data/news/. app/output/news/; fi
+          if [ -d data/rss ]; then cp -a data/rss/. app/output/rss/; fi
+          today="$(TZ=Asia/Shanghai date +%F)"
+          if [ ! -f "app/output/news/${today}.db" ] && [ -f seed-news.db ]; then
+            cp seed-news.db "app/output/news/${today}.db"
+          fi
+          if [ ! -f "app/output/rss/${today}.db" ] && [ -f seed-rss.db ]; then
+            cp seed-rss.db "app/output/rss/${today}.db"
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Collect hotspots and render page
+        working-directory: app
+        env:
+          TZ: Asia/Shanghai
+        run: |
+          uv sync --locked --no-dev
+          uv run python -m trendradar
+
+      - name: Persist data and prepare Pages artifact
+        run: |
+          mkdir -p data/news data/rss site
+          cp -a app/output/news/. data/news/
+          cp -a app/output/rss/. data/rss/ 2>/dev/null || true
+          cp app/output/index.html site/index.html
+          touch site/.nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data site
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update rolling hotspot data"
+            git push
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
