@@ -1,0 +1,177 @@
+# TrendRadar 自媒体选题雷达关键词文件 v2
+# 适用账号：
+# 1. 刘律师：民商事诉讼 + 可作法律解读的社会热点
+# 2. Your China Lawyer Brown：外国人来华视角 + 中国法律与社会生活
+#
+# 使用说明：
+# - [方括号] 是推送中显示的分类名称
+# - 同一组内的普通关键词是“或”的关系
+# - !关键词 表示仅在当前组排除
+# - @数字 表示当前组最多显示多少条
+# - 这份文件不只抓“法律新闻”，也抓适合律师解读的社会事件
+# - 英文关键词使用较完整短语，避免仅用 China、law、visa 造成噪音
+
+[GLOBAL_FILTER]
+法考培训
+法考课程
+律师培训班
+
+[WORD_GROUPS]
+
+# ==================== 刘律师：民商事诉讼 ====================
+
+[法律新规与权威案例]
+/最高人民法院|最高法|司法解释|指导性案例|典型案例|人民法院案例库|全国人大常委会|民法典|新公司法|民事诉讼法|劳动合同法|婚姻家庭编解释/ => 法律新规与权威案例
+!刑事辩护
+@15
+
+[开庭与诉讼程序]
+/开庭|庭审|举证|质证|证据三性|证明力|举证责任|证明责任|争议焦点|管辖权异议|诉讼时效|诉前调解|法院调解|上诉|再审|判决书|裁定书|庭审笔录|书记员|法官助理/ => 开庭与诉讼程序
+!刑事辩护
+@15
+
+[财产保全与强制执行]
+/财产保全|诉前保全|查封|冻结|强制执行|执行难|执行异议|执行和解|终本|恢复执行|失信被执行人|限制高消费|拒不履行判决|胜诉回款/ => 财产保全与强制执行
+@12
+
+[婚姻家事与夫妻财产]
+/离婚|夫妻共同财产|夫妻共同债务|婚内财产|婚前财产|婚前协议|忠诚协议|彩礼|房产分割|股权分割|财产转移|隐匿财产|抚养权|抚养费|探望权|家事审判|离婚冷静期|婚姻登记|事实婚姻|非婚生子女/ => 婚姻家事与夫妻财产
+@15
+
+[继承与遗产]
+/继承纠纷|遗产继承|法定继承|遗嘱继承|遗赠|遗嘱效力|遗产范围|遗产分割|继承人|放弃继承|遗产管理人/ => 继承与遗产
+@10
+
+[劳动争议与工伤]
+/劳动仲裁|劳动争议|违法解除|经济补偿|赔偿金|劳动合同|未签劳动合同|工资拖欠|加班费|竞业限制|工伤认定|职业病|社保补缴|劳动关系|灵活用工/ => 劳动争议与工伤
+!招聘广告
+@15
+
+[公司股权与经营纠纷]
+/股东纠纷|股权纠纷|股权转让|股东出资|抽逃出资|公司僵局|公司解散|法定代表人|实际控制人|对赌协议|股东知情权|公司担保|董监高责任|合伙纠纷|合作经营纠纷/ => 公司股权与经营纠纷
+@12
+
+[房产与建设工程纠纷]
+/房屋买卖纠纷|二手房纠纷|商品房纠纷|房屋租赁纠纷|产权过户|共有房产|建设工程纠纷|工程款|工程质量|实际施工人|物业纠纷|拆迁补偿/ => 房产与建设工程纠纷
+!房产广告
+@12
+
+[合同债务与担保]
+/合同纠纷|违约责任|解除合同|民间借贷|债权债务|欠款|担保责任|保证人|抵押权|定金|违约金|代位权|撤销权|债权人撤销权/ => 合同债务与担保
+!贷款广告
+@12
+
+[侵权赔偿与消费者维权]
+/侵权责任|人身损害|交通事故赔偿|医疗损害|产品责任|消费者权益|霸王条款|退款纠纷|平台责任|名誉权|隐私权|网络暴力|个人信息泄露|高空抛物|宠物伤人/ => 侵权赔偿与消费者维权
+@12
+
+# ==================== 可作法律解读的社会热点 ====================
+
+[女性权益与性别议题]
+/女性权益|妇女权益|性别平等|就业歧视|职场性别歧视|孕期辞退|产假|生育歧视|性骚扰|职场性骚扰|家庭暴力|家暴|人身安全保护令|偷拍|隐私泄露|单身女性生育|冻卵|全职妈妈|冠姓权|女性继承权/ => 女性权益与性别议题
+@15
+
+[婚恋家庭与社会制度]
+/婚姻制度|婚恋观|结婚登记|婚姻登记|离婚登记|离婚冷静期|彩礼纠纷|天价彩礼|婚前买房|婚后买房|夫妻AA制|全职主妇|全职爸爸|催婚|不婚|非婚生育|单亲家庭|再婚家庭|代孕|收养|养老责任/ => 婚恋家庭与社会制度
+@15
+
+[未成年人和校园权益]
+/未成年人保护|校园欺凌|校园霸凌|未成年人打赏|未成年人充值|未成年人网络沉迷|学生伤害|校园安全|教师体罚|儿童虐待|监护责任|留守儿童|困境儿童|未成年人犯罪|家庭教育令/ => 未成年人和校园权益
+@12
+
+[刑事犯罪与公共安全]
+/电信诈骗|网络诈骗|杀猪盘|帮信罪|非法集资|传销|拐卖妇女儿童|性侵|猥亵|故意伤害|正当防卫|防卫过当|寻衅滋事|醉驾|危险驾驶|高空抛物|投毒|虐待|遗弃|偷拍盗摄|深度伪造诈骗|AI诈骗|网络赌博/ => 刑事犯罪与公共安全
+@15
+
+[明星名人与高关注纠纷]
+/明星离婚|名人离婚|豪门离婚|明星财产分割|明星抚养权|明星继承|遗产争夺|豪门遗产|明星股权|名人股权|艺人解约|经纪合同纠纷|明星代言|主播违约|网红纠纷|直播打赏纠纷|偷税漏税|税务风波|上市公司控制权/ => 明星名人与高关注纠纷
+@15
+
+[企业家股权和财富争议]
+/企业家离婚|创始人离婚|离婚影响股权|夫妻股权分割|上市公司股权|控制权争夺|股权代持|家族企业传承|家族信托|企业继承|高管离职|竞业纠纷|商业秘密|合伙人反目|创始人出局|公司内斗/ => 企业家股权和财富争议
+@12
+
+[职场现象与普通人权益]
+/裁员|降薪|末位淘汰|大小周|加班文化|调岗降薪|职场霸凌|职场PUA|试用期辞退|应届生解约|外包员工|平台用工|骑手权益|网约车司机|主播劳动关系|退休年龄|延迟退休|社保断缴|育儿假|陪产假/ => 职场现象与普通人权益
+@15
+
+[住房教育医疗养老制度]
+/房价|烂尾楼|保交房|学区房|物业费|公摊面积|租售同权|保障性住房|户籍制度|落户政策|教育公平|学位房|医疗纠纷|医保改革|养老保险|养老金|养老院|独生子女养老|长期护理保险/ => 住房教育医疗养老制度
+@15
+
+[互联网平台和新技术风险]
+/平台封号|账号被封|大数据杀熟|算法歧视|自动续费|直播打赏|网络暴力|人肉搜索|开盒|隐私泄露|刷脸支付|人脸识别|AI换脸|AI声音克隆|深度伪造|生成式人工智能|数据泄露|个人信息买卖|网约车平台责任/ => 互联网平台和新技术风险
+@15
+
+[消费事件和公共争议]
+/预付卡跑路|健身房跑路|教培机构跑路|充值退款|酒店退订|机票退改|食品安全|餐饮纠纷|旅游纠纷|医美纠纷|宠物纠纷|快递丢失|商品召回|虚假宣传|价格欺诈|霸王条款|消费者维权|公共场所受伤/ => 消费事件和公共争议
+@15
+
+# ==================== Brown：外国人在中国 ====================
+
+[China Visa and Residence]
+/外国人在华|外国人来华|外籍人士在华|中国签证|来华签证|签证政策|免签入境|过境免签|居留许可|永久居留|外国人永久居留|出入境管理|出境限制|\bChina visa\b|\bChinese visa\b|\bvisa-free (entry|travel) (to )?China\b|\btransit visa exemption\b|\bChina residence permit\b|\bChinese residence permit\b|\bpermanent residence in China\b|\bforeign nationals in China\b|\bforeigners in China\b|\bChina exit ban\b/i => China Visa and Residence
+@15
+
+[China Work Permit and Employment]
+/外国人工作许可|外国人来华工作|外籍员工|外国人在华就业|外国人就业证|外籍人士劳动合同|外籍员工劳动争议|\bChina work permit\b|\bwork permit in China\b|\bforeign employee in China\b|\bexpat employment China\b|\bemployment contract China\b|\blabor arbitration China\b|\bunlawful termination China\b|\bwrongful termination China\b/i => China Work Permit and Employment
+@15
+
+[International Marriage and Family]
+/涉外婚姻|跨国婚姻|涉外离婚|跨国离婚|涉外家事|涉外抚养权|涉外财产分割|外国人中国结婚|外国人中国离婚|\binternational marriage China\b|\bcross-border marriage China\b|\bdivorce in China\b|\bcross-border divorce China\b|\bdivision of marital assets China\b|\bchild custody China\b|\bprenuptial agreement China\b|\bmarriage registration China\b/i => International Marriage and Family
+@12
+
+[Foreign Investment and Company Law]
+/外商投资|外国投资者|外商独资企业|外资企业|外商投资企业|外国人在华创业|外国人在中国开公司|外籍法定代表人|外资股权纠纷|外资企业合规|\bforeign investment China\b|\bforeign-invested enterprise\b|\bFIE China\b|\bcompany registration China\b|\bstart a business in China\b|\bChinese company law\b|\bshareholder dispute China\b|\blegal representative China\b/i => Foreign Investment and Company Law
+@12
+
+[Cross-border Contracts and Disputes]
+/涉外合同|跨境合同|国际商事纠纷|涉外诉讼|涉外仲裁|国际仲裁|境外判决承认与执行|外国判决承认与执行|跨境追债|涉外送达|涉外授权委托|跨境债务|\bChina contract dispute\b|\bcross-border contract China\b|\bforeign-related litigation China\b|\binternational arbitration China\b|\benforcement of foreign judgment China\b|\brecognition of foreign judgment China\b|\bservice of process China\b|\bpower of attorney China\b|\bdemand letter China\b|\bcross-border debt recovery China\b/i => Cross-border Contracts and Disputes
+@12
+
+[Property and Housing in China]
+/外国人在中国买房|外籍人士买房|涉外房产|外籍人士租房|外国人房屋租赁|涉外房产过户|境外继承人房产|\bbuying property in China\b|\bforeigners buying property in China\b|\bproperty transfer China\b|\breal estate China foreigners\b|\brental dispute China\b|\bhousing lease China\b/i => Property and Housing in China
+!房产广告
+@10
+
+[China Tax Data and Compliance]
+/外籍人士个税|外国人个人所得税|外籍人员税收|跨境数据|数据出境|个人信息保护法|外资企业数据合规|外国人税务|\bChina tax for foreigners\b|\bexpat tax China\b|\bindividual income tax China expatriate\b|\bPIPL China\b|\bChina data privacy\b|\bcross-border data transfer China\b|\bChina compliance for foreign companies\b/i => China Tax Data and Compliance
+@10
+
+[Foreigners Practical Legal Issues]
+/外国人在华法律|外籍人士法律服务|外国人在中国维权|外籍人士消费纠纷|外国人在华交通事故|外国人在华继承|外国人在华租房|外国人在华银行账户|\bChina legal help for foreigners\b|\blegal issues for foreigners in China\b|\bforeigners rights in China\b|\btraffic accident China foreigner\b|\binheritance in China foreigner\b|\bconsumer rights China foreigner\b/i => Foreigners Practical Legal Issues
+@12
+
+# ==================== 模拟外国人来华视角 ====================
+
+[Coming to China]
+/外国人来中国|外国游客中国|外国人中国旅行|入境中国|来华旅游|中国免签|过境免签|外国人入境登记|临时住宿登记|外国人住宿登记|\bcoming to China\b|\btravel to China\b|\bvisiting China\b|\bChina travel rules\b|\bentry requirements China\b|\bvisa-free China\b|\btransit through China\b|\btemporary residence registration China\b/i => Coming to China
+@15
+
+[Living in China as a Foreigner]
+/外国人在中国生活|外籍人士在中国生活|外国人在华生活|外国人租房|外国人在中国看病|外国人在中国上学|国际学校|外国人在中国养老|\bliving in China as a foreigner\b|\bexpat life in China\b|\bmoving to China\b|\brenting in China as a foreigner\b|\bhealthcare in China for foreigners\b|\binternational school China\b|\braising children in China\b/i => Living in China as a Foreigner
+@15
+
+[China Payments Banking and Mobile Life]
+/外国人移动支付|外国人支付宝|外国人微信支付|外国人银行卡|境外银行卡绑定|外国人手机卡|外国人实名认证|外国人开银行账户|现金支付拒收|\bAlipay for foreigners\b|\bWeChat Pay for foreigners\b|\bmobile payment China foreigner\b|\bforeign card in China\b|\bbank account China foreigner\b|\bSIM card China foreigner\b|\breal-name registration China\b/i => China Payments Banking and Mobile Life
+@12
+
+[Driving Transport and Accidents in China]
+/外国人中国驾照|境外驾驶证换证|外国人在华交通事故|外国人租车|外国人高铁|外国人网约车|交通事故责任|酒驾|醉驾|\bdriving in China as a foreigner\b|\bChina driving license foreigner\b|\bconvert foreign driving license China\b|\btraffic accident in China\b|\brenting a car in China\b|\bhigh-speed rail China foreigner\b/i => Driving Transport and Accidents in China
+@12
+
+[China Rules Foreigners May Not Expect]
+/外国人在华违法|外国人行政处罚|外国人治安处罚|外国人遣返|外国人驱逐出境|临时住宿登记|网络实名制|手机实名制|禁毒规定|公共场所吸烟|无人机规定|航拍规定|地图测绘规定|\bChina laws foreigners should know\b|\brules in China for foreigners\b|\bthings illegal in China\b|\bforeigner detained in China\b|\bdeportation from China\b|\bdrone rules China\b|\bpublic security rules China\b/i => China Rules Foreigners May Not Expect
+@15
+
+[Foreigner Reactions to Chinese Society]
+/外国人看中国|外国人体验中国|外国人谈中国|外国人在中国惊讶|老外看中国|老外体验中国|外国人中国生活成本|外国人中国安全吗|\bforeigners react to China\b|\bwhat surprised me in China\b|\bChina culture shock\b|\bis China safe for foreigners\b|\bcost of living in China\b|\bwhat foreigners think about China\b/i => Foreigner Reactions to Chinese Society
+@15
+
+[Foreigners and Chinese Social Systems]
+/外国人看中国婚姻|外国人看中国教育|外国人看中国养老|外国人看中国买房|外国人看中国职场|外国人看中国医疗|外国人看中国户口|外国人看中国家庭|\bChinese marriage system\b|\bChinese family law for foreigners\b|\bChinese workplace culture foreigner\b|\bChinese education system foreigner\b|\bChinese healthcare system foreigner\b|\bChinese housing system foreigner\b|\bhukou explained for foreigners\b/i => Foreigners and Chinese Social Systems
+@15
+
+[Foreigners Doing Business in China]
+/外国人在华经商|外国人在中国做生意|外国人在中国创业|外国人开店|外籍人士直播带货|外国人在华电商|外国人在华纳税|\bdoing business in China as a foreigner\b|\bforeign entrepreneur China\b|\bforeigners starting a company in China\b|\be-commerce China foreigner\b|\bChina business culture foreigner\b|\btax in China for foreigners\b/i => Foreigners Doing Business in China
+@12
