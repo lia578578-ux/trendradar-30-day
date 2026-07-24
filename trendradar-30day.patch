@@ -1,0 +1,329 @@
+diff --git a/config/config.en.yaml b/config/config.en.yaml
+index b89a4d51..e77193e7 100644
+--- a/config/config.en.yaml
++++ b/config/config.en.yaml
+@@ -159,6 +159,8 @@ report:
+                                       # current = current ranking, push currently-ranked matched news on schedule (persistent items reappear each time)
+                                       # incremental = incremental monitoring, push only new content, zero duplication (no push if nothing new)
+ 
++  lookback_days: 1                    # Rolling window for daily mode (1=today only, 30=latest 30 days)
++
+   display_mode: "keyword"             # Grouping dimension
+                                       # keyword = group by keyword
+                                       # platform = group by platform/source
+diff --git a/config/config.yaml b/config/config.yaml
+index b743c7c7..3d472c23 100644
+--- a/config/config.yaml
++++ b/config/config.yaml
+@@ -153,11 +153,13 @@ rss:
+ # 4. 报告模式
+ # ===============================================================
+ report:
+-  mode: "current"                     # 报告模式（开启 schedule 后作为默认值，会被 timeline 时段覆盖）
++  mode: "daily"                       # 报告模式（开启 schedule 后作为默认值，会被 timeline 时段覆盖）
+                                       # daily = 当日汇总，按时推送当天所有匹配新闻（会包含之前推过的）
+                                       # current = 当前榜单，按时推送当前在榜的匹配新闻（持续在榜的每次都出现）
+                                       # incremental = 增量监控，只推送新增内容，零重复（没有新增时不推送）
+ 
++  lookback_days: 30                   # daily 模式的滚动汇总天数（1=仅当天，30=近30天）
++
+   display_mode: "keyword"             # 分组维度
+                                       # keyword = 按关键词分组显示
+                                       # platform = 按平台/来源分组显示
+diff --git a/trendradar/__main__.py b/trendradar/__main__.py
+index 3cf9d235..9e2003d8 100644
+--- a/trendradar/__main__.py
++++ b/trendradar/__main__.py
+@@ -9,6 +9,7 @@ TrendRadar 主程序
+ import argparse
+ import os
+ import webbrowser
++from datetime import timedelta
+ from pathlib import Path
+ from typing import Dict, List, Optional, Tuple
+ 
+@@ -451,12 +452,25 @@ class NewsAnalyzer:
+             if not quiet:
+                 print(f"当前监控平台: {current_platform_ids}")
+ 
+-            all_results, id_to_name, title_info = self.ctx.read_today_titles(
+-                current_platform_ids, quiet=quiet
++            lookback_days = (
++                self.ctx.config.get("REPORT_LOOKBACK_DAYS", 1)
++                if self.report_mode == "daily"
++                else 1
+             )
++            if lookback_days > 1:
++                all_results, id_to_name, title_info = self.ctx.read_recent_titles(
++                    lookback_days, current_platform_ids, quiet=quiet
++                )
++            else:
++                all_results, id_to_name, title_info = self.ctx.read_today_titles(
++                    current_platform_ids, quiet=quiet
++                )
+ 
+             if not all_results:
+-                print("没有找到当天的数据")
++                if lookback_days > 1:
++                    print(f"没有找到近 {lookback_days} 天的数据")
++                else:
++                    print("没有找到当天的数据")
+                 return None
+ 
+             total_titles = sum(len(titles) for titles in all_results.values())
+@@ -779,6 +793,18 @@ class NewsAnalyzer:
+                 report_metadata={
+                     "hotlist_total": total_titles,
+                     "platform_total": len(self.ctx.platform_ids),
++                    "lookback_days": self.ctx.config.get("REPORT_LOOKBACK_DAYS", 1)
++                    if mode == "daily"
++                    else 1,
++                    "lookback_start": (
++                        self.ctx.get_time()
++                        - timedelta(
++                            days=self.ctx.config.get("REPORT_LOOKBACK_DAYS", 1) - 1
++                        )
++                    ).strftime("%Y-%m-%d")
++                    if mode == "daily"
++                    else self.ctx.format_date(),
++                    "lookback_end": self.ctx.format_date(),
+                     "rss_matched_count": self._rss_matched_count,
+                     "rss_total_count": self._rss_total_count,
+                     "rss_source_total": self._rss_source_total,
+diff --git a/trendradar/context.py b/trendradar/context.py
+index 79bc2a98..1faf3dee 100644
+--- a/trendradar/context.py
++++ b/trendradar/context.py
+@@ -23,6 +23,7 @@ from trendradar.core import (
+     load_frequency_words,
+     matches_word_groups,
+     read_all_today_titles,
++    read_recent_titles,
+     detect_latest_new_titles,
+     count_word_frequency,
+     Scheduler,
+@@ -222,6 +223,21 @@ class AppContext:
+         """读取当天所有标题"""
+         return read_all_today_titles(self.get_storage_manager(), platform_ids, quiet=quiet)
+ 
++    def read_recent_titles(
++        self,
++        days: int,
++        platform_ids: Optional[List[str]] = None,
++        quiet: bool = False,
++    ) -> Tuple[Dict, Dict, Dict]:
++        """读取并聚合最近 N 个自然日的标题。"""
++        return read_recent_titles(
++            self.get_storage_manager(),
++            days=days,
++            current_platform_ids=platform_ids,
++            end_date=self.format_date(),
++            quiet=quiet,
++        )
++
+     def detect_new_titles(
+         self, platform_ids: Optional[List[str]] = None, quiet: bool = False
+     ) -> Dict:
+diff --git a/trendradar/core/__init__.py b/trendradar/core/__init__.py
+index 255439fb..91685837 100644
+--- a/trendradar/core/__init__.py
++++ b/trendradar/core/__init__.py
+@@ -15,6 +15,7 @@ from trendradar.core.scheduler import Scheduler, ResolvedSchedule
+ from trendradar.core.data import (
+     read_all_today_titles_from_storage,
+     read_all_today_titles,
++    read_recent_titles,
+     detect_latest_new_titles_from_storage,
+     detect_latest_new_titles,
+ )
+@@ -36,6 +37,7 @@ __all__ = [
+     # 数据处理
+     "read_all_today_titles_from_storage",
+     "read_all_today_titles",
++    "read_recent_titles",
+     "detect_latest_new_titles_from_storage",
+     "detect_latest_new_titles",
+     # 统计分析
+diff --git a/trendradar/core/data.py b/trendradar/core/data.py
+index 29164322..f4e7ece0 100644
+--- a/trendradar/core/data.py
++++ b/trendradar/core/data.py
+@@ -9,6 +9,7 @@
+ Author: TrendRadar Team
+ """
+ 
++from datetime import date, datetime, timedelta
+ from typing import Dict, List, Tuple, Optional
+ 
+ 
+@@ -110,6 +111,109 @@ def read_all_today_titles(
+     return all_results, final_id_to_name, title_info
+ 
+ 
++def read_recent_titles(
++    storage_manager,
++    days: int = 30,
++    current_platform_ids: Optional[List[str]] = None,
++    end_date: Optional[str] = None,
++    quiet: bool = False,
++) -> Tuple[Dict, Dict, Dict]:
++    """
++    读取滚动时间窗口内的热榜数据并跨天聚合。
++
++    相同平台下标题相同的条目视为同一热点；排名范围去重合并，
++    抓取次数累加，首次/末次出现时间附带日期，便于 HTML 展示。
++    """
++    days = max(1, min(int(days), 365))
++    if end_date:
++        end = datetime.strptime(end_date, "%Y-%m-%d").date()
++    else:
++        end = date.today()
++    start = end - timedelta(days=days - 1)
++
++    results: Dict = {}
++    id_to_name: Dict = {}
++    title_info: Dict = {}
++    loaded_days = 0
++
++    for offset in range(days):
++        current_date = start + timedelta(days=offset)
++        date_str = current_date.isoformat()
++        news_data = storage_manager.get_today_all_data(date_str)
++        if not news_data or not news_data.items:
++            continue
++        loaded_days += 1
++
++        for source_id, news_list in news_data.items.items():
++            if (
++                current_platform_ids is not None
++                and source_id not in current_platform_ids
++            ):
++                continue
++
++            id_to_name[source_id] = news_data.id_to_name.get(source_id, source_id)
++            source_results = results.setdefault(source_id, {})
++            source_info = title_info.setdefault(source_id, {})
++
++            for item in news_list:
++                title = item.title
++                ranks = item.ranks or ([item.rank] if item.rank else [])
++                first_time = item.first_time or item.crawl_time
++                last_time = item.last_time or item.crawl_time
++                dated_first = f"{date_str[5:]} {first_time}" if first_time else date_str[5:]
++                dated_last = f"{date_str[5:]} {last_time}" if last_time else date_str[5:]
++                dated_timeline = [
++                    {
++                        **point,
++                        "time": f"{date_str[5:]} {point.get('time', '')}".strip(),
++                    }
++                    for point in (item.rank_timeline or [])
++                ]
++
++                if title not in source_results:
++                    source_results[title] = {
++                        "ranks": sorted(set(ranks)),
++                        "url": item.url or "",
++                        "mobileUrl": item.mobile_url or "",
++                    }
++                    source_info[title] = {
++                        "first_time": dated_first,
++                        "last_time": dated_last,
++                        "count": item.count,
++                        "ranks": sorted(set(ranks)),
++                        "url": item.url or "",
++                        "mobileUrl": item.mobile_url or "",
++                        "rank_timeline": dated_timeline,
++                    }
++                    continue
++
++                existing = source_info[title]
++                merged_ranks = sorted(set(existing.get("ranks", [])) | set(ranks))
++                existing["ranks"] = merged_ranks
++                existing["count"] = existing.get("count", 0) + item.count
++                existing["last_time"] = dated_last
++                existing["rank_timeline"].extend(dated_timeline)
++                if item.url:
++                    existing["url"] = item.url
++                if item.mobile_url:
++                    existing["mobileUrl"] = item.mobile_url
++
++                source_results[title] = {
++                    "ranks": merged_ranks,
++                    "url": existing.get("url", ""),
++                    "mobileUrl": existing.get("mobileUrl", ""),
++                }
++
++    if not quiet:
++        total_count = sum(len(titles) for titles in results.values())
++        print(
++            f"[存储] 近 {days} 天窗口 {start.isoformat()} ~ {end.isoformat()}："
++            f"读取 {loaded_days} 天数据，聚合为 {total_count} 条热点"
++        )
++
++    return results, id_to_name, title_info
++
++
+ def detect_latest_new_titles_from_storage(
+     storage_manager,
+     current_platform_ids: Optional[List[str]] = None,
+diff --git a/trendradar/core/loader.py b/trendradar/core/loader.py
+index 49e83918..16b49617 100644
+--- a/trendradar/core/loader.py
++++ b/trendradar/core/loader.py
+@@ -73,9 +73,24 @@ def _load_report_config(config_data: Dict) -> Dict:
+     # 环境变量覆盖
+     sort_by_position_env = _get_env_bool("SORT_BY_POSITION_FIRST")
+     max_news_env = _get_env_int_or_none("MAX_NEWS_PER_KEYWORD")
++    lookback_days_env = _get_env_int_or_none("REPORT_LOOKBACK_DAYS")
++
++    raw_lookback_days = (
++        lookback_days_env
++        if lookback_days_env is not None
++        else report_config.get("lookback_days", 1)
++    )
++    try:
++        lookback_days = max(1, min(int(raw_lookback_days), 365))
++    except (TypeError, ValueError):
++        print(
++            f"[警告] report.lookback_days 格式错误 ({raw_lookback_days})，使用默认值 1"
++        )
++        lookback_days = 1
+ 
+     return {
+         "REPORT_MODE": report_config.get("mode", "daily"),
++        "REPORT_LOOKBACK_DAYS": lookback_days,
+         "DISPLAY_MODE": report_config.get("display_mode", "keyword"),
+         "RANK_THRESHOLD": report_config.get("rank_threshold", 10),
+         "SORT_BY_POSITION_FIRST": sort_by_position_env if sort_by_position_env is not None else report_config.get("sort_by_position_first", False),
+diff --git a/trendradar/report/generator.py b/trendradar/report/generator.py
+index 721915ac..fe7ef782 100644
+--- a/trendradar/report/generator.py
++++ b/trendradar/report/generator.py
+@@ -207,6 +207,7 @@ def generate_html_report(
+         _METADATA_KEYS = {
+             "hotlist_total", "platform_total", "rss_matched_count",
+             "rss_total_count", "rss_source_total", "rss_source_failed",
++            "lookback_days", "lookback_start", "lookback_end",
+         }
+         for key in _METADATA_KEYS:
+             if key in report_metadata:
+diff --git a/trendradar/report/html.py b/trendradar/report/html.py
+index 4a760d45..a12375b7 100644
+--- a/trendradar/report/html.py
++++ b/trendradar/report/html.py
+@@ -1439,7 +1439,14 @@ def render_html_content(
+         now = datetime.now()
+ 
+     # 处理报告类型显示
+-    if mode == "current":
++    lookback_days = report_data.get("lookback_days", 1)
++    if mode == "daily" and lookback_days > 1:
++        lookback_start = report_data.get("lookback_start", "")
++        lookback_end = report_data.get("lookback_end", "")
++        mode_display = f"热榜近{lookback_days}天汇总"
++        if lookback_start and lookback_end:
++            mode_display += f"（{lookback_start[5:]} 至 {lookback_end[5:]}）"
++    elif mode == "current":
+         mode_display = "当前榜单"
+     elif mode == "incremental":
+         mode_display = "增量分析"
