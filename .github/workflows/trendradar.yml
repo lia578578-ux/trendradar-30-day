@@ -1,5 +1,6 @@
 # GitHub Pages publishing is enabled
-# Automatic refresh: twice per hour, away from GitHub peak scheduler minutes
+# Automatic refresh: request a run every 10 minutes so scheduler delays/drops
+# still leave enough chances for the dashboard to refresh at least twice per hour.
 name: Update TrendRadar 30-day dashboard
 
 on:
@@ -10,7 +11,7 @@ on:
     paths:
       - ".github/workflows/trendradar.yml"
   schedule:
-    - cron: "7,37 * * * *"
+    - cron: "9,19,29,39,49,59 * * * *"
 
 permissions:
   contents: write
@@ -19,11 +20,12 @@ permissions:
 
 concurrency:
   group: trendradar-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
